@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>100x — Choose Wisely</title>
+  <meta name="description" content="A super‑simple gate: choose 100x to enter." />
+  <style>
+    :root{
+      --bg:#000; --fg:#fff; --muted:#888; --accent:#00ff88;
+      --glow:rgba(0,255,136,0.3);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;overflow-x:hidden}
+    a{color:var(--fg);text-decoration:none}
+
+    /* Animated background */
+    body::before{
+      content:'';
+      position:fixed;
+      inset:0;
+      background:radial-gradient(circle at 50% 50%, rgba(0,255,136,0.03) 0%, transparent 50%);
+      animation:pulse 8s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes pulse{
+      0%,100%{opacity:.3;transform:scale(1)}
+      50%{opacity:.6;transform:scale(1.1)}
+    }
+
+    /* Gate */
+    .gate{
+      position:fixed;inset:0;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(0,0,0,.98);
+      backdrop-filter:blur(10px);
+      z-index:10;
+      animation:fadeIn .4s ease;
+    }
+    @keyframes fadeIn{from{opacity:0}}
+    
+    .card{
+      width:min(640px,92vw);
+      padding:40px;
+      border:1px solid #222;
+      border-radius:24px;
+      background:linear-gradient(135deg, #0a0a0a 0%, #0f0f0f 100%);
+      box-shadow:0 20px 60px rgba(0,0,0,.8), 0 0 80px rgba(0,255,136,.05);
+      text-align:center;
+      animation:slideUp .5s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    @keyframes slideUp{
+      from{opacity:0;transform:translateY(30px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    
+    .card::before{
+      content:'';
+      position:absolute;
+      top:-50%;left:-50%;
+      width:200%;height:200%;
+      background:conic-gradient(from 0deg at 50% 50%, transparent 0deg, var(--glow) 60deg, transparent 120deg);
+      animation:rotate 6s linear infinite;
+      opacity:.4;
+    }
+    @keyframes rotate{to{transform:rotate(360deg)}}
+    
+    .card-content{position:relative;z-index:1}
+    
+    .title{
+      font-weight:900;
+      font-size:clamp(36px, 8vw, 56px);
+      letter-spacing:.5px;
+      margin:0 0 12px;
+      background:linear-gradient(135deg, #fff 0%, #00ff88 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .accent{
+      color:var(--accent);
+      text-shadow:0 0 20px var(--glow);
+      animation:glow 2s ease-in-out infinite;
+    }
+    @keyframes glow{
+      0%,100%{filter:brightness(1)}
+      50%{filter:brightness(1.4)}
+    }
+    
+    .subtitle{
+      color:var(--muted);
+      margin:0 0 32px;
+      font-size:15px;
+      line-height:1.6;
+    }
+    
+    .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+    .btn{
+      flex:1 1 180px;
+      padding:18px 28px;
+      border:2px solid transparent;
+      border-radius:16px;
+      font-weight:800;
+      font-size:19px;
+      cursor:pointer;
+      transition:all .3s cubic-bezier(.4,0,.2,1);
+      position:relative;
+      overflow:hidden;
+    }
+    .btn::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(45deg, transparent, rgba(255,255,255,.1), transparent);
+      transform:translateX(-100%);
+      transition:transform .6s;
+    }
+    .btn:hover::before{transform:translateX(100%)}
+    .btn:active{transform:scale(.97)}
+    
+    .btn-yes{
+      background:linear-gradient(135deg, #00ff88 0%, #00cc70 100%);
+      color:#06170f;
+      border-color:var(--accent);
+      box-shadow:0 0 30px rgba(0,255,136,.4), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    .btn-yes:hover{
+      transform:translateY(-3px);
+      box-shadow:0 0 50px rgba(0,255,136,.6), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    
+    .btn-no{
+      background:#141414;
+      color:#bbb;
+      border-color:#222;
+    }
+    .btn-no:hover{
+      background:#1a1a1a;
+      border-color:#333;
+    }
+    
+    .denied{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
+    @keyframes shake{
+      0%,100%{transform:translateX(0)}
+      10%,30%,50%,70%,90%{transform:translateX(-8px)}
+      20%,40%,60%,80%{transform:translateX(8px)}
+    }
+
+    /* Main content */
+    main{
+      min-height:100svh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 20px;
+      opacity:0;
+      animation:fadeInMain 1s ease forwards;
+    }
+    @keyframes fadeInMain{to{opacity:1}}
+    
+    .wrap{
+      max-width:1100px;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:40px;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+    }
+    
+    .hero{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      position:relative;
+    }
+    .hero::before{
+      content:'';
+      position:absolute;
+      inset:-20px;
+      background:radial-gradient(circle, var(--glow) 0%, transparent 70%);
+      opacity:0;
+      animation:heroGlow 3s ease-in-out infinite;
+    }
+    @keyframes heroGlow{
+      0%,100%{opacity:0}
+      50%{opacity:.3}
+    }
+    
+    .hero img{
+      max-width:90vw;
+      max-height:60vh;
+      border-radius:16px;
+      display:block;
+      margin:auto;
+      border:1px solid #222;
+      box-shadow:0 20px 60px rgba(0,0,0,.6);
+      animation:float 6s ease-in-out infinite;
+      position:relative;
+      z-index:1;
+    }
+    @keyframes float{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-10px)}
+    }
+
+    .small{
+      color:var(--muted);
+      font-size:15px;
+      animation:slideIn .8s ease;
+    }
+    @keyframes slideIn{
+      from{opacity:0;transform:translateY(20px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    /* Icon row */
+    .icons{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      justify-content:center;
+      animation:slideIn 1s ease .2s backwards;
+    }
+    .ic{
+      display:inline-flex;
+      align-items:center;
+      gap:12px;
+      padding:16px 22px;
+      border:1px solid #1b1b1b;
+      border-radius:16px;
+      background:#101010;
+      transition:all .3s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .ic::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg, transparent, rgba(0,255,136,.05));
+      opacity:0;
+      transition:opacity .3s;
+    }
+    .ic:hover{
+      transform:translateY(-4px);
+      border-color:#2a2a2a;
+      box-shadow:0 8px 24px rgba(0,0,0,.4);
+    }
+    .ic:hover::before{opacity:1}
+    .ic img{
+      width:32px;
+      height:32px;
+      display:block;
+      transition:transform .3s;
+      position:relative;
+      z-index:1;
+    }
+    .ic:hover img{transform:scale(1.1) rotate(5deg)}
+    .label{
+      font-weight:800;
+      opacity:.95;
+      position:relative;
+      z-index:1;
+    }
+
+    footer{
+      opacity:.5;
+      text-align:center;
+      font-size:13px;
+      margin-top:20px;
+      animation:slideIn 1.2s ease .4s backwards;
+    }
+
+    /* Gate exit animation */
+    .gate.exiting{
+      animation:fadeOut .5s ease forwards;
+    }
+    @keyframes fadeOut{
+      to{opacity:0;pointer-events:none}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Gate Overlay -->
+  <div class="gate" id="gate">
+    <div class="card" id="card">
+      <div class="card-content">
+        <h1 class="title">Sex or <span class="accent">100x</span>?</h1>
+        <p class="subtitle">Choose <strong>100x</strong> to enter. (Wrong choice = no entry.)</p>
+        <div class="btns">
+          <button class="btn btn-no" id="btn-sex">SEX</button>
+          <button class="btn btn-yes" id="btn-100x">100x</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="wrap">
+      <!-- HERO IMAGE -->
+      <div class="hero">
+        <img src="1.png" alt="100x hero" />
+      </div>
+      <p class="small">If you didn't pick 100x at the gate, you wouldn't be reading this. ✅</p>
+
+      <!-- ICON LINKS with PNGs -->
+      <nav class="icons">
+        <a class="ic" href="https://x.com/i/communities/1973141237113762183" target="_blank" rel="noopener">
+          <img src="x.png" alt="X" />
+          <span class="label">X / Twitter</span>
+        </a>
+        <a class="ic" href="https://dexscreener.com/solana/brn2b6hgphktrvrdqfonk6mta8f33tnmemvadszff5ee" target="_blank" rel="noopener">
+          <img src="dex.png" alt="DEX" />
+          <span class="label">DEXSCREENER</span>
+        </a>
+        <a class="ic" href="https://pump.fun/coin/DEv3wHpBxJSR9nLdXXwjpQeHxjTWNF1D2f3iV6mEpump" target="_blank" rel="noopener">
+          <img src="pump.png" alt="Pump" />
+          <span class="label">pump.fun</span>
+        </a>
+      </nav>
+
+      <footer>© 100x — choose wisely.</footer>
+    </div>
+  </main>
+
+  <script>
+    const gate = document.getElementById('gate');
+    const card = document.getElementById('card');
+    const btnSex = document.getElementById('btn-sex');
+    const btn100x = document.getElementById('btn-100x');
+    
+    btnSex.addEventListener('click', () => {
+      card.classList.remove('denied');
+      void card.offsetWidth;
+      card.classList.add('denied');
+      setTimeout(() => card.classList.remove('denied'), 400);
+    });
+    
+    btn100x.addEventListener('click', () => {
+      gate.classList.add('exiting');
+      setTimeout(() => gate.style.display = 'none', 500);
+    });
+  </script>
+</body>
+</html>
